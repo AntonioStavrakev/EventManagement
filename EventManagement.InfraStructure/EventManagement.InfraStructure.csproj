@@ -19,10 +19,4 @@
     <ProjectReference Include="..\EventManagement.Core\EventManagement.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mapper\" />
-    <Folder Include="Migrations\" />
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
 </Project>
