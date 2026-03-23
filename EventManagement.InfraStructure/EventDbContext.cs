@@ -32,5 +32,25 @@ namespace EventManagement.InfraStructure
 
         }
 
+        public EventDbContext()
+        {
+            
+        }
+
+        protected EventDbContext(DbSet<Event> events, DbSet<User> users, DbSet<Speaker> speakers, DbSet<Registration> registrations)
+        {
+            Events = events;
+            Users = users;
+            Speakers = speakers;
+            Registrations = registrations;
+        }
+
+        public EventDbContext(DbContextOptions options, DbSet<Event> events, DbSet<User> users, DbSet<Speaker> speakers, DbSet<Registration> registrations) : base(options)
+        {
+            Events = events;
+            Users = users;
+            Speakers = speakers;
+            Registrations = registrations;
+        }
     }
 }

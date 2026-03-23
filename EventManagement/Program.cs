@@ -1,54 +1,38 @@
-using EventManagement.Core.Repositories;
 using EventManagement.InfraStructure;
-using EventManagement.InfraStructure.Mapper;
-using EventManagement.InfraStructure.Repositories;
-using EventManagement.Services.Services;
-using EventManagement.Services.Validators;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// MVC
+builder.Services.AddControllersWithViews();
 
+// DB (MySQL вече)
 builder.Services.AddDbContext<EventDbContext>(options =>
-    options.UseSqlServer(
-        "Server=(localdb)\\MSSQLLocalDB;Database=EventManagementDb;Trusted_Connection=True;",
-        b => b.MigrationsAssembly("EventManagement.InfraStructure")
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     ));
 
-
-
-builder.Services.AddScoped<IEventManagementRepository, EventRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ISpeakerRepository, SpeakerRepository>();
-builder.Services.AddScoped<IRegistrationReposiory, RegistrationRepository>();
-
-builder.Services.AddScoped<EventService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<SpeakerService>();
-builder.Services.AddScoped<RegistrationService>();
-
-builder.Services.AddControllers();
-
-
-builder.Services.AddValidatorsFromAssemblyContaining<EventValidator>();
-
-
-builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// pipeline
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseExceptionHandler("/Home/Error");
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
 app.UseAuthorization();
-app.MapControllers();
+
+// MVC routing
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

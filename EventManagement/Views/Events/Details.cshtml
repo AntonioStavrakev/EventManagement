@@ -1,0 +1,180 @@
+@model EventManagement.Core.ViewModels.EventDetailsViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var fillPct = Model.MaxCapacity > 0 ? (Model.CurrentAttendees * 100 / Model.MaxCapacity) : 0;
+
+    var organizerInitials = !string.IsNullOrWhiteSpace(Model.OrganizerName)
+        ? string.Concat(
+            Model.OrganizerName
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Where(w => !string.IsNullOrWhiteSpace(w))
+                .Select(w => w[0]))
+        : "?";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a asp-controller="Events" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Назад към Events
+    </a>
+    <div class="d-flex gap-2">
+        <a asp-controller="Events" asp-action="Edit" asp-route-id="@Model.Id"
+           class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-pencil me-1"></i>Редактирай
+        </a>
+        <a asp-controller="Events" asp-action="Delete" asp-route-id="@Model.Id"
+           class="btn btn-sm" style="background:#FCEBEB;color:#A32D2D;border:1px solid #F7C1C1;">
+            <i class="bi bi-trash me-1"></i>Изтрий
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex gap-3 align-items-start">
+                    <div style="width:70px;height:70px;border-radius:12px;background:#E6F1FB;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;">
+                        @(Model.Category switch { "Conference" => "🚀", "Workshop" => "🎨", "Webinar" => "☁️", "Networking" => "🤝", _ => "📅" })
+                    </div>
+                    <div>
+                        <h4 class="fw-semibold mb-1">@Model.Title</h4>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="badge" style="background:#E6F1FB;color:#185FA5;border-radius:20px;padding:4px 10px;font-size:12px;">
+                                @Model.Category
+                            </span>
+                            <span class="badge badge-@((Model.Status ?? "active").ToLower())" style="border-radius:20px;padding:4px 10px;font-size:12px;">
+                                @Model.Status
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <hr />
+                    <p style="font-size:14px;color:#444;line-height:1.7;">@Model.Description</p>
+                }
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3">Детайли</h6>
+                <div class="row g-3">
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Начална дата</p>
+                        <p class="fw-semibold mb-0" style="font-size:14px;">@Model.StartDate.ToString("dd MMMM yyyy, HH:mm")</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Крайна дата</p>
+                        <p class="fw-semibold mb-0" style="font-size:14px;">@Model.EndDate.ToString("dd MMMM yyyy, HH:mm")</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Локация</p>
+                        <p class="fw-semibold mb-0" style="font-size:14px;">@Model.Location</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Цена на билет</p>
+                        <p class="fw-semibold mb-0" style="font-size:14px;">@(Model.TicketPrice == 0 ? "Безплатно" : Model.TicketPrice.ToString("0.00") + " BGN")</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Създаден на</p>
+                        <p class="fw-semibold mb-0" style="font-size:14px;">@Model.CreatedOn.ToString("dd MMM yyyy")</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.04em;">Организатор</p>
+                        <p class="fw-semibold mb-0" style="font-size:14px;">@Model.OrganizerName</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-semibold mb-0">Последни участници</h6>
+                    <a asp-controller="Attendees" asp-action="Index" asp-route-eventId="@Model.Id"
+                       class="text-decoration-none" style="font-size:13px;color:#185FA5;">
+                        Виж всички →
+                    </a>
+                </div>
+                @if (Model.RecentAttendees != null && Model.RecentAttendees.Any())
+                {
+                    <table class="table table-sm" style="font-size:14px;">
+                        <thead>
+                            <tr class="text-muted" style="font-size:12px;">
+                                <th></th>
+                                <th>Име</th>
+                                <th>Имейл</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var att in Model.RecentAttendees)
+                            {
+                                var initials = !string.IsNullOrEmpty(att.FirstName) && !string.IsNullOrEmpty(att.LastName)
+                                    ? string.Concat(att.FirstName[0], att.LastName[0])
+                                    : "??";
+
+                                <tr>
+                                    <td>
+                                        <div style="width:30px;height:30px;border-radius:50%;background:#E6F1FB;color:#185FA5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">
+                                            @initials
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold">@att.FirstName @att.LastName</td>
+                                    <td class="text-muted">@att.Email</td>
+                                    <td>
+                                        <span class="badge badge-@((att.Status ?? "confirmed").ToLower())"
+                                              style="border-radius:20px;padding:3px 8px;font-size:11px;">
+                                            @att.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-3" style="font-size:14px;">Все още няма регистрирани участници.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-3">Капацитет</h6>
+                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                    <span style="font-size:28px;font-weight:600;color:#185FA5;">@Model.CurrentAttendees</span>
+                    <span class="text-muted" style="font-size:14px;">/ @Model.MaxCapacity</span>
+                </div>
+                <div style="height:8px;background:#eee;border-radius:4px;overflow:hidden;margin-bottom:8px;">
+                    <div style="height:100%;border-radius:4px;background:#185FA5;width:@fillPct%;transition:width .3s;"></div>
+                </div>
+                <p class="text-muted mb-3" style="font-size:12px;">@fillPct% запълнен</p>
+                <a asp-controller="Attendees" asp-action="Index" asp-route-eventId="@Model.Id"
+                   class="btn btn-brand w-100">
+                    <i class="bi bi-people me-1"></i>Виж участниците
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-semibold mb-2">Организатор</h6>
+                <div class="d-flex gap-2 align-items-center">
+                    <div style="width:38px;height:38px;border-radius:50%;background:#E6F1FB;color:#185FA5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">
+                        @organizerInitials
+                    </div>
+                    <div>
+                        <p class="fw-semibold mb-0" style="font-size:14px;">@Model.OrganizerName</p>
+                        <p class="text-muted mb-0" style="font-size:12px;">@Model.OrganizerEmail</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

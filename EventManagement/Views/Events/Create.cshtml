@@ -1,0 +1,54 @@
+@model EventManagement.Core.ViewModels.EventFormViewModel
+
+@{
+    ViewData["Title"] = "Create Event";
+}
+
+<h4 class="mb-4">Създаване на събитие</h4>
+
+<form asp-action="Create" method="post">
+
+    <div class="mb-3">
+        <label class="form-label">Заглавие</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Описание</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Категория</label>
+        <input asp-for="Category" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Начална дата</label>
+        <input asp-for="StartDate" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Крайна дата</label>
+        <input asp-for="EndDate" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Локация</label>
+        <input asp-for="Location" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Капацитет</label>
+        <input asp-for="MaxCapacity" type="number" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Цена</label>
+        <input asp-for="TicketPrice" type="number" step="0.01" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Създай</button>
+    <a asp-action="Index" class="btn btn-secondary">Отказ</a>
+
+</form>

@@ -1,0 +1,166 @@
+@model EventManagement.Core.ViewModels.AttendeesViewModel
+@{
+    ViewData["Title"] = "Участници";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h4 class="fw-semibold mb-1">Участници</h4>
+        <p class="text-muted mb-0" style="font-size:14px;">
+            @if (Model.EventTitle != null)
+            {
+                <span><i class="bi bi-calendar3 me-1"></i>@Model.EventTitle — </span>
+            }
+            @(Model.Attendees?.Count() ?? 0) регистрирани
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Attendees" asp-action="ExportCsv" asp-route-eventId="@Model.EventId"
+           class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-download me-1"></i>Експорт CSV
+        </a>
+        @if (Model.EventId != null)
+        {
+            <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.EventId"
+               class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Към Event
+            </a>
+        }
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-3">
+    <form asp-action="Index" method="get" class="d-flex gap-2 w-100">
+        @if (Model.EventId != null)
+        {
+            <input type="hidden" name="eventId" value="@Model.EventId" />
+        }
+        <input type="text" name="search" value="@ViewBag.Search"
+               class="form-control" placeholder="Търсене по име или имейл..." style="border-radius:8px;" />
+        <select name="statusFilter" class="form-select" style="width:160px;border-radius:8px;">
+            <option value="">Всички статуси</option>
+            <option value="Confirmed" selected="@(ViewBag.StatusFilter == "Confirmed")">Confirmed</option>
+            <option value="Pending" selected="@(ViewBag.StatusFilter == "Pending")">Pending</option>
+            <option value="Cancelled" selected="@(ViewBag.StatusFilter == "Cancelled")">Cancelled</option>
+        </select>
+        <button type="submit" class="btn btn-outline-secondary" style="border-radius:8px;">
+            <i class="bi bi-search"></i>
+        </button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        @if (Model.Attendees != null && Model.Attendees.Any())
+        {
+            <table class="table table-hover mb-0" style="font-size:14px;">
+                <thead>
+                    <tr style="font-size:12px;color:#888;border-bottom:1px solid #e9ecef;">
+                        <th class="ps-3" style="padding:12px 8px;"></th>
+                        <th style="padding:12px 8px;">Участник</th>
+                        <th style="padding:12px 8px;">Имейл</th>
+                        @if (Model.EventId == null)
+                        {
+                            <th style="padding:12px 8px;">Event</th>
+                        }
+                        <th style="padding:12px 8px;">Регистриран на</th>
+                        <th style="padding:12px 8px;">Статус</th>
+                        <th style="padding:12px 8px;">Билет №</th>
+                        <th style="padding:12px 8px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var att in Model.Attendees)
+                    {
+                        var initials = !string.IsNullOrEmpty(att.FirstName) && !string.IsNullOrEmpty(att.LastName)
+                            ? $"{att.FirstName[0]}{att.LastName[0]}"
+                            : "??";
+
+                        var colors = new[] {
+                            ("#E6F1FB","#185FA5"), ("#EAF3DE","#3B6D11"),
+                            ("#EEEDFE","#534AB7"), ("#FAEEDA","#854F0B"), ("#FAECE7","#993C1D")
+                        };
+
+                        var clr = colors[Math.Abs((att.Email ?? string.Empty).GetHashCode()) % colors.Length];
+
+                        <tr>
+                            <td class="ps-3" style="padding:12px 8px;">
+                                <div style="width:32px;height:32px;border-radius:50%;background:@clr.Item1;color:@clr.Item2;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">
+                                    @initials
+                                </div>
+                            </td>
+                            <td style="padding:12px 8px;font-weight:500;">@att.FirstName @att.LastName</td>
+                            <td style="padding:12px 8px;color:#888;">@att.Email</td>
+                            @if (Model.EventId == null)
+                            {
+                                <td style="padding:12px 8px;">
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@att.EventId"
+                                       class="text-decoration-none" style="color:#185FA5;font-size:13px;">
+                                        @att.EventTitle
+                                    </a>
+                                </td>
+                            }
+                            <td style="padding:12px 8px;color:#888;">@att.RegistrationDate.ToString("dd MMM yyyy")</td>
+                            <td style="padding:12px 8px;">
+                                <span class="badge badge-@((att.Status ?? "confirmed").ToLower())"
+                                      style="border-radius:20px;padding:4px 10px;font-size:11px;">
+                                    @att.Status
+                                </span>
+                            </td>
+                            <td style="padding:12px 8px;color:#888;font-size:12px;">@att.TicketNumber</td>
+                            <td style="padding:12px 8px;">
+                                <form asp-controller="Attendees" asp-action="Remove" asp-route-id="@att.Id" method="post"
+                                      onsubmit="return confirm('Премахни участника?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm py-1 px-2"
+                                            style="background:#FCEBEB;color:#A32D2D;border:1px solid #F7C1C1;font-size:12px;">
+                                        <i class="bi bi-person-x"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (ViewBag.TotalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center p-3 border-top" style="font-size:13px;">
+                    <span class="text-muted">
+                        Показани @((ViewBag.CurrentPage - 1) * 20 + 1) – @Math.Min(ViewBag.CurrentPage * 20, Model.Attendees.Count()) от @Model.Attendees.Count()
+                    </span>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                                   asp-route-eventId="@Model.EventId">←</a>
+                            </li>
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-page="@i"
+                                       asp-route-eventId="@Model.EventId">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                                   asp-route-eventId="@Model.EventId">→</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <div style="font-size:40px;">👥</div>
+                <h6 class="mt-3 text-muted">Няма намерени участници</h6>
+                <p class="text-muted" style="font-size:14px;">Все още няма регистрирани участници за това събитие.</p>
+            </div>
+        }
+    </div>
+</div>

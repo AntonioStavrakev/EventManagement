@@ -1,0 +1,120 @@
+@model EventManagement.Core.ViewModels.EventFormViewModel
+@{
+    ViewData["Title"] = "Редактирай Event";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-semibold mb-1">Редактирай Event</h4>
+        <p class="text-muted mb-0" style="font-size:14px;">Промени детайлите на събитието.</p>
+    </div>
+    <a asp-controller="Events" asp-action="Index" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-x-lg me-1"></i>Отказ
+    </a>
+</div>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-semibold mb-3">Основна информация</h6>
+
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Заглавие *</label>
+                        <input asp-for="Title" class="form-control" placeholder="напр. Tech Innovation Summit" />
+                        <span asp-validation-for="Title" class="text-danger" style="font-size:12px;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Описание</label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишете вашето събитие..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger" style="font-size:12px;"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label asp-for="Category" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Категория *</label>
+                            <select asp-for="Category" class="form-select"
+                                    asp-items="@(new SelectList(new[] { "Conference", "Workshop", "Webinar", "Networking", "Other" }))">
+                                <option value="">-- Избери --</option>
+                            </select>
+                            <span asp-validation-for="Category" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Status" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Статус</label>
+                            <select asp-for="Status" class="form-select"
+                                    asp-items="@(new SelectList(new[] { "Active", "Pending", "Cancelled" }))">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-semibold mb-3">Дата и час</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label asp-for="StartDate" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Начална дата *</label>
+                            <input asp-for="StartDate" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="EndDate" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Крайна дата *</label>
+                            <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="EndDate" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="fw-semibold mb-3">Локация и капацитет</h6>
+
+                    <div class="mb-3">
+                        <label asp-for="Location" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Локация *</label>
+                        <input asp-for="Location" class="form-control" placeholder="напр. Sofia Tech Park, Hall A" />
+                        <span asp-validation-for="Location" class="text-danger" style="font-size:12px;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="MaxCapacity" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Максимален капацитет *</label>
+                        <input asp-for="MaxCapacity" type="number" class="form-control" placeholder="200" min="1" />
+                        <span asp-validation-for="MaxCapacity" class="text-danger" style="font-size:12px;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TicketPrice" class="form-label" style="font-size:13px;font-weight:500;color:#555;">Цена на билет (BGN)</label>
+                        <div class="input-group">
+                            <input asp-for="TicketPrice" type="number" step="0.01" class="form-control" placeholder="0.00" min="0" />
+                            <span class="input-group-text" style="font-size:13px;">BGN</span>
+                        </div>
+                        <div class="form-text" style="font-size:12px;">Оставете 0 за безплатен event.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" style="font-size:13px;"></div>
+                    <div class="d-flex flex-column gap-2">
+                        <button type="submit" class="btn btn-brand">
+                            <i class="bi bi-check-lg me-1"></i>Запази промените
+                        </button>
+                        <a asp-controller="Events" asp-action="Index" class="btn btn-outline-secondary text-center">
+                            Отказ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
