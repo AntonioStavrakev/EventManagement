@@ -55,3 +55,4 @@ public class RegistrationValidatorTests
 
         Assert.That(result.IsValid, Is.True);
     }
+}
