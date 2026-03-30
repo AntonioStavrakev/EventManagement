@@ -8,9 +8,12 @@
         <h4 class="fw-semibold mb-1">Dashboard</h4>
         <p class="text-muted mb-0" style="font-size:14px;">Добре дошли! Ето текущото състояние на вашите events.</p>
     </div>
-    <a asp-controller="Events" asp-action="Create" class="btn btn-brand">
-        <i class="bi bi-plus-lg me-1"></i>Нов Event
-    </a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-controller="Events" asp-action="Create" class="btn btn-brand">
+            <i class="bi bi-plus-lg me-1"></i>Нов Event
+        </a>
+    }
 </div>
 
 <!-- Stats -->
@@ -97,10 +100,13 @@
             <div class="card-body">
                 <h6 class="fw-semibold mb-3">Бързи действия</h6>
                 <div class="d-flex flex-column gap-2">
-                    <a asp-controller="Events" asp-action="Create"
-                       class="btn btn-outline-secondary text-start" style="font-size:13px;">
-                        <i class="bi bi-calendar-plus me-2"></i>Създай нов event
-                    </a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Events" asp-action="Create"
+                           class="btn btn-outline-secondary text-start" style="font-size:13px;">
+                            <i class="bi bi-calendar-plus me-2"></i>Създай нов event
+                        </a>
+                    }
                     <a asp-controller="Events" asp-action="Index"
                        class="btn btn-outline-secondary text-start" style="font-size:13px;">
                         <i class="bi bi-list-ul me-2"></i>Управлявай events

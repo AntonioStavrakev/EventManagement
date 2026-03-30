@@ -1,21 +1,18 @@
-using EventManagement.Core.ViewModels;
+using EventManagement.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventManagement.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
-    public IActionResult Index()
-    {
-        var model = new DashboardViewModel
-        {
-            TotalEvents = 0,
-            ActiveEvents = 0,
-            TotalAttendees = 0,
-            UpcomingEvents = 0,
-            RecentEvents = new List<EventViewModel>()
-        };
+    private readonly IEventDemoStore _store;
 
-        return View(model);
+    public HomeController(IEventDemoStore store)
+    {
+        _store = store;
     }
+
+    public IActionResult Index() => View(_store.GetDashboard());
 }
