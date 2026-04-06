@@ -1,58 +1,26 @@
-@model EventManagement.Core.ViewModels.EventViewModel
+@model EventViewModel
 @{
-    ViewData["Title"] = "Изтриване на Event";
+    ViewData["Title"] = "Delete Event";
 }
 
-<div class="row justify-content-center mt-4">
-    <div class="col-md-6 col-lg-5">
-        <div class="card border-0" style="border:1px solid #F7C1C1 !important;border-radius:12px;">
-            <div class="card-body text-center p-4">
-                <div style="font-size:48px;margin-bottom:1rem;">⚠️</div>
-                <h5 class="fw-semibold" style="color:#A32D2D;">Изтриване на Event</h5>
-                <p class="text-muted" style="font-size:14px;">
-                    Сигурни ли сте, че искате да изтриете
-                    <strong>"@Model.Title"</strong>?
-                    Това действие е необратимо.
-                </p>
+<div class="center-panel">
+    <div class="content-card content-card--danger">
+        <span class="eyebrow">Danger zone</span>
+        <h1>Изтриване на събитие</h1>
+        <p>На път си да изтриеш <strong>@Model.Title</strong>. Това действие е необратимо и ще премахне всички регистрации към него.</p>
 
-                <div class="text-start p-3 rounded mb-3" style="background:#FCEBEB;border:1px solid #F7C1C1;">
-                    <p class="mb-1" style="font-size:12px;color:#A32D2D;font-weight:600;">Ще бъде изтрито:</p>
-                    <div style="font-size:13px;color:#555;">
-                        <div><i class="bi bi-people me-1"></i>@Model.CurrentAttendees регистрации на участници</div>
-                        <div><i class="bi bi-calendar3 me-1"></i>Всички данни за събитието</div>
-                    </div>
-                </div>
+        <ul class="detail-list mb-4">
+            <li><strong>Дата</strong><span>@Model.StartDate.ToString("dd MMM yyyy, HH:mm")</span></li>
+            <li><strong>Локация</strong><span>@Model.Location</span></li>
+            <li><strong>Регистрации</strong><span>@Model.CurrentAttendees</span></li>
+        </ul>
 
-                <div class="p-3 rounded mb-4 text-start" style="background:#f7f7f7;">
-                    <div style="font-size:13px;">
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">Заглавие:</span>
-                            <span class="fw-semibold">@Model.Title</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">Дата:</span>
-                            <span>@Model.StartDate.ToString("dd MMM yyyy")</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">Локация:</span>
-                            <span>@Model.Location</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex gap-2 justify-content-center">
-                    <a asp-controller="Events" asp-action="Details" asp-route-id="@Model.Id"
-                       class="btn btn-outline-secondary px-4">
-                        Отказ
-                    </a>
-                    <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn px-4" style="background:#A32D2D;color:white;border:none;">
-                            <i class="bi bi-trash me-1"></i>Изтрий
-                        </button>
-                    </form>
-                </div>
-            </div>
+        <div class="d-flex flex-wrap gap-3">
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">Cancel</a>
+            <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">Delete permanently</button>
+            </form>
         </div>
     </div>
 </div>

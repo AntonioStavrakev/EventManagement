@@ -1,116 +1,114 @@
-@model EventManagement.Core.ViewModels.DashboardViewModel
+@model DashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Home";
 }
 
-<div class="d-flex justify-content-between align-items-start mb-4">
-    <div>
-        <h4 class="fw-semibold mb-1">Dashboard</h4>
-        <p class="text-muted mb-0" style="font-size:14px;">Добре дошли! Ето текущото състояние на вашите events.</p>
-    </div>
-    <a asp-controller="Events" asp-action="Create" class="btn btn-brand">
-        <i class="bi bi-plus-lg me-1"></i>Нов Event
-    </a>
-</div>
-
-<!-- Stats -->
-<div class="row g-3 mb-4">
-    <div class="col-sm-6 col-lg-3">
-        <div class="card p-3">
-            <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;">Общо Events</p>
-            <p class="mb-0 fw-semibold" style="font-size:28px;color:#185FA5;">@Model.TotalEvents</p>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card p-3">
-            <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;">Активни</p>
-            <p class="mb-0 fw-semibold" style="font-size:28px;color:#3B6D11;">@Model.ActiveEvents</p>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card p-3">
-            <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;">Общо Участници</p>
-            <p class="mb-0 fw-semibold" style="font-size:28px;color:#854F0B;">@Model.TotalAttendees</p>
-        </div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-        <div class="card p-3">
-            <p class="text-muted mb-1" style="font-size:12px;text-transform:uppercase;letter-spacing:.05em;">Предстоящи (7 дни)</p>
-            <p class="mb-0 fw-semibold" style="font-size:28px;color:#A32D2D;">@Model.UpcomingEvents</p>
-        </div>
-    </div>
-</div>
-
-<div class="row g-3">
-    <!-- Upcoming Events Table -->
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="fw-semibold mb-3">Предстоящи Events</h6>
-                @if (Model.RecentEvents.Any())
+<section class="hero-panel mb-5">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+            <span class="hero-chip">Event platform for organizers and attendees</span>
+            <h1 class="display-5 mt-3 mb-3">Създавай, управлявай и откривай събития на едно място.</h1>
+            <p class="hero-copy mb-4">
+                @if (Model.IsAuthenticated)
                 {
-                    <table class="table table-sm" style="font-size:14px;">
-                        <thead>
-                            <tr class="text-muted" style="font-size:12px;">
-                                <th>Събитие</th>
-                                <th>Дата</th>
-                                <th>Участници</th>
-                                <th>Статус</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var ev in Model.RecentEvents)
-                            {
-                                <tr>
-                                    <td>
-                                        <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id"
-                                           class="text-decoration-none fw-semibold" style="color:#185FA5;">
-                                            @ev.Title
-                                        </a>
-                                    </td>
-                                    <td class="text-muted">@ev.StartDate.ToString("dd MMM yyyy")</td>
-                                    <td class="text-muted">@ev.CurrentAttendees / @ev.MaxCapacity</td>
-                                    <td>
-                                        <span class="badge badge-@ev.Status.ToString().ToLower()" style="border-radius:20px;padding:4px 10px;font-size:11px;">
-                                            @ev.Status
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                    <span>@Model.UserFirstName, всичко ти е подредено: събитията, които организираш, записванията ти и участниците в тях.</span>
                 }
                 else
                 {
-                    <p class="text-muted text-center py-3" style="font-size:14px;">Няма предстоящи events.</p>
+                    <span>Започни от началната страница, регистрирай се и веднага създай първото си събитие без хардкоднати потребители и без допълнителна настройка.</span>
                 }
-                <a asp-controller="Events" asp-action="Index" class="text-decoration-none" style="font-size:13px;color:#185FA5;">
-                    Виж всички →
-                </a>
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                @if (Model.IsAuthenticated)
+                {
+                    <a asp-controller="Events" asp-action="Create" class="btn btn-brand btn-lg">Create Event</a>
+                    <a asp-controller="Events" asp-action="MyEvents" class="btn btn-outline-light btn-lg">Manage My Events</a>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-brand btn-lg">Register</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-light btn-lg">Login</a>
+                }
             </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="hero-card-grid">
+                <article class="metric-card accent-blue">
+                    <p>All Events</p>
+                    <strong>@Model.TotalEvents</strong>
+                </article>
+                <article class="metric-card accent-green">
+                    <p>Upcoming 7 Days</p>
+                    <strong>@Model.UpcomingEvents</strong>
+                </article>
+                <article class="metric-card accent-gold">
+                    <p>Total Registrations</p>
+                    <strong>@Model.TotalAttendees</strong>
+                </article>
+                <article class="metric-card accent-rose">
+                    <p>@(Model.IsAuthenticated ? "My Events" : "Active Events")</p>
+                    <strong>@(Model.IsAuthenticated ? Model.MyEvents : Model.ActiveEvents)</strong>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="content-card h-100">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Featured</span>
+                    <h2>Предстоящи събития</h2>
+                </div>
+                <a asp-controller="Events" asp-action="Index" class="btn btn-sm btn-outline-dark">View all</a>
+            </div>
+
+            @if (Model.RecentEvents.Any())
+            {
+                <div class="event-list">
+                    @foreach (var ev in Model.RecentEvents)
+                    {
+                        <article class="event-list__item">
+                            <div>
+                                <p class="event-category">@ev.Category</p>
+                                <h3><a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id">@ev.Title</a></h3>
+                                <p class="event-meta">@ev.StartDate.ToString("dd MMM yyyy, HH:mm") • @ev.Location • @ev.OrganizerName</p>
+                            </div>
+                            <div class="event-badges">
+                                <span class="status-pill status-pill--@ev.Status.ToLowerInvariant()">@ev.Status</span>
+                                <span class="capacity-pill">@ev.CurrentAttendees / @ev.MaxCapacity</span>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <h3>Все още няма публикувани събития</h3>
+                    <p>Създай първото и използвай платформата като пълно демо за курса.</p>
+                    @if (Model.IsAuthenticated)
+                    {
+                        <a asp-controller="Events" asp-action="Create" class="btn btn-brand">Create the first event</a>
+                    }
+                </div>
+            }
         </div>
     </div>
 
-    <!-- Quick Actions -->
     <div class="col-lg-4">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="fw-semibold mb-3">Бързи действия</h6>
-                <div class="d-flex flex-column gap-2">
-                    <a asp-controller="Events" asp-action="Create"
-                       class="btn btn-outline-secondary text-start" style="font-size:13px;">
-                        <i class="bi bi-calendar-plus me-2"></i>Създай нов event
-                    </a>
-                    <a asp-controller="Events" asp-action="Index"
-                       class="btn btn-outline-secondary text-start" style="font-size:13px;">
-                        <i class="bi bi-list-ul me-2"></i>Управлявай events
-                    </a>
-                    <a asp-controller="Attendees" asp-action="Index"
-                       class="btn btn-outline-secondary text-start" style="font-size:13px;">
-                        <i class="bi bi-people me-2"></i>Виж участниците
-                    </a>
-                </div>
-            </div>
+        <div class="content-card h-100">
+            <span class="eyebrow">Why it works</span>
+            <h2>Готово за предаване</h2>
+            <ul class="feature-list">
+                <li>Home index page като начален вход към приложението</li>
+                <li>Регистрация и login с реални потребители в база</li>
+                <li>Само създателят на event може да edit/delete</li>
+                <li>Записване за event и управление на участници</li>
+                <li>Отделни страници за My Events, Schedule и Profile</li>
+            </ul>
         </div>
     </div>
-</div>
+</section>

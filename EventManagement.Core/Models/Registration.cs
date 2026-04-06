@@ -16,20 +16,27 @@ namespace EventManagement.InfraStructure
         public int EventId { get; set; }
 
         [Required]
-        public DateTime RegistrationDate { get; set; } 
+        public DateTime RegistrationDate { get; set; }
 
-        
-        public virtual User User { get; set; }
-        public virtual Event Event { get; set; }
+        [Required]
+        public string Status { get; set; } = "Confirmed";
 
-        public Registration() { }
+        [MaxLength(32)]
+        public string? TicketNumber { get; set; }
+
+        public virtual User User { get; set; } = null!;
+        public virtual Event Event { get; set; } = null!;
+
+        public Registration()
+        {
+        }
 
         public Registration(int registrationId, int userId, int eventId)
         {
             RegistrationId = registrationId;
             UserId = userId;
             EventId = eventId;
-            RegistrationDate = DateTime.Now;
+            RegistrationDate = DateTime.UtcNow;
         }
     }
 }

@@ -1,56 +1,100 @@
-@using Microsoft.EntityFrameworkCore
-@model IEnumerable<EventManagement.Core.ViewModels.EventViewModel>
-
+@model IEnumerable<EventViewModel>
 @{
-ViewData["Title"] = "Events";
+    ViewData["Title"] = "Explore Events";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-semibold">Събития</h4>
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i>Нов Event
-    </a>
+<section class="page-header">
+    <div>
+        <span class="eyebrow">Explore</span>
+        <h1>Открий подходящото събитие</h1>
+        <p>Търси по ключова дума, категория и следи кои събития вече са в твоя график.</p>
+    </div>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a asp-action="Create" class="btn btn-brand">Create Event</a>
+    }
+</section>
+
+<div class="content-card mb-4">
+    <form asp-action="Index" method="get" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label">Search</label>
+            <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="event, локация, описание..." />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-select">
+                <option value="">All categories</option>
+                @foreach (var category in (IEnumerable<string>)ViewBag.Categories)
+                {
+                    <option value="@category" selected="@(ViewBag.Category == category ? "selected" : null)">@category</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Scope</label>
+            <select name="scope" class="form-select">
+                <option value="all" selected="@(ViewBag.Scope == "all" ? "selected" : null)">All</option>
+                <option value="upcoming" selected="@(ViewBag.Scope == "upcoming" ? "selected" : null)">Upcoming</option>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <option value="mine" selected="@(ViewBag.Scope == "mine" ? "selected" : null)">Mine</option>
+                    <option value="registered" selected="@(ViewBag.Scope == "registered" ? "selected" : null)">Registered</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark w-100">Apply</button>
+        </div>
+    </form>
 </div>
 
-<div class="card">
-    <div class="card-body p-0">
-        @if (Model != null && Model.Any())
+<div class="row g-4">
+    @if (Model.Any())
+    {
+        @foreach (var ev in Model)
         {
-        <table class="table table-hover mb-0">
-            <thead>
-            <tr>
-                <th>Заглавие</th>
-                <th>Категория</th>
-                <th>Дата</th>
-                <th>Локация</th>
-                <th>Участници</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var ev in Model)
-            {
-            <tr>
-                <td>@ev.Title</td>
-                <td>@ev.Category</td>
-                <td>@ev.StartDate.ToString("dd MMM yyyy")</td>
-                <td>@ev.Location</td>
-                <td>@ev.CurrentAttendees / @ev.MaxCapacity</td>
-                <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-secondary">View</a>
-                    <a asp-action="Edit" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                </td>
-            </tr>
-            }
-            </tbody>
-        </table>
+            <div class="col-md-6 col-xl-4">
+                <article class="event-card">
+                    <div class="event-card__top">
+                        <span class="status-pill status-pill--@ev.Status.ToLowerInvariant()">@ev.Status</span>
+                        <span class="event-card__price">@(ev.TicketPrice == 0 ? "Free" : $"{ev.TicketPrice:0.00} BGN")</span>
+                    </div>
+                    <p class="event-category">@ev.Category</p>
+                    <h2>@ev.Title</h2>
+                    <p class="event-card__description">@(!string.IsNullOrWhiteSpace(ev.Description) ? ev.Description : "Без допълнително описание.")</p>
+                    <ul class="event-card__meta">
+                        <li>@ev.StartDate.ToString("dd MMM yyyy, HH:mm")</li>
+                        <li>@ev.Location</li>
+                        <li>@ev.OrganizerName</li>
+                        <li>@ev.CurrentAttendees / @ev.MaxCapacity участници</li>
+                    </ul>
+                    <div class="event-card__actions">
+                        <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-dark">Details</a>
+                        @if (ev.IsOwner)
+                        {
+                            <a asp-action="Edit" asp-route-id="@ev.Id" class="btn btn-outline-dark">Edit</a>
+                        }
+                        else if (ev.IsRegistered)
+                        {
+                            <span class="badge rounded-pill text-bg-success align-self-center">Registered</span>
+                        }
+                    </div>
+                </article>
+            </div>
         }
-        else
-        {
-        <div class="text-center p-4 text-muted">
-            Няма събития
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="empty-state">
+                <h3>Няма намерени събития</h3>
+                <p>Пробвай различен филтър или създай първото събитие в платформата.</p>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-action="Create" class="btn btn-brand">Create Event</a>
+                }
+            </div>
         </div>
-        }
-    </div>
+    }
 </div>

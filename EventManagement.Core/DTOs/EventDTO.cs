@@ -8,7 +8,7 @@ namespace EventManagement.Core.DTOs
 {
     public class EventBaseDto
     {
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime Date { get; set; }
         public string? Location { get; set; }
@@ -29,6 +29,6 @@ namespace EventManagement.Core.DTOs
     {
         public int EventId { get; set; }
         public int SpeakerId { get; set; }
-        public string SpeakerName { get; set; }
+        public string SpeakerName { get; set; } = string.Empty;
     }
 }

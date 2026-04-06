@@ -1,0 +1,48 @@
+@model IEnumerable<EventViewModel>
+@{
+    ViewData["Title"] = "My Schedule";
+}
+
+<section class="page-header">
+    <div>
+        <span class="eyebrow">Schedule</span>
+        <h1>Моят график</h1>
+        <p>Събитията, за които си се регистрирал, са събрани на едно място.</p>
+    </div>
+    <a asp-action="Index" asp-route-scope="registered" class="btn btn-outline-dark">Open filtered explore</a>
+</section>
+
+<div class="row g-4">
+    @if (Model.Any())
+    {
+        @foreach (var ev in Model)
+        {
+            <div class="col-md-6">
+                <article class="event-card">
+                    <span class="event-category">@ev.Category</span>
+                    <h2>@ev.Title</h2>
+                    <p class="event-card__description">@ev.Description</p>
+                    <ul class="event-card__meta">
+                        <li>@ev.StartDate.ToString("dd MMM yyyy, HH:mm")</li>
+                        <li>@ev.Location</li>
+                        <li>@ev.OrganizerName</li>
+                    </ul>
+                    <div class="event-card__actions">
+                        <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-dark">View Details</a>
+                        <span class="badge rounded-pill text-bg-success align-self-center">Registered</span>
+                    </div>
+                </article>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="empty-state">
+                <h3>Все още не си се записал за събитие</h3>
+                <p>Разгледай наличните event-и и добави първите в графика си.</p>
+                <a asp-action="Index" class="btn btn-brand">Explore events</a>
+            </div>
+        </div>
+    }
+</div>

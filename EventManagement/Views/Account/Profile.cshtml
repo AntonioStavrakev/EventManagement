@@ -1,0 +1,64 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<section class="page-header">
+    <div>
+        <span class="eyebrow">Profile</span>
+        <h1>@Model.FullName</h1>
+        <p>@Model.Email • член от @Model.MemberSince.ToString("dd MMM yyyy")</p>
+    </div>
+    <a asp-controller="Events" asp-action="Create" class="btn btn-brand">Create Event</a>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="content-card h-100">
+            <span class="eyebrow">Account</span>
+            <h2>Основна информация</h2>
+            <ul class="detail-list">
+                <li><strong>Име</strong><span>@Model.FullName</span></li>
+                <li><strong>Имейл</strong><span>@Model.Email</span></li>
+                <li><strong>Рождена дата</strong><span>@Model.DateOfBirth.ToString("dd MMM yyyy")</span></li>
+                <li><strong>Created events</strong><span>@Model.CreatedEventsCount</span></li>
+                <li><strong>Registered events</strong><span>@Model.RegisteredEventsCount</span></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="content-card h-100">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Upcoming</span>
+                    <h2>Предстоящи мои събития</h2>
+                </div>
+                <a asp-controller="Events" asp-action="MyEvents" class="btn btn-sm btn-outline-dark">View all</a>
+            </div>
+
+            @if (Model.UpcomingOwnedEvents.Any())
+            {
+                <div class="event-list">
+                    @foreach (var ev in Model.UpcomingOwnedEvents)
+                    {
+                        <article class="event-list__item">
+                            <div>
+                                <p class="event-category">@ev.Category</p>
+                                <h3><a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id">@ev.Title</a></h3>
+                                <p class="event-meta">@ev.StartDate.ToString("dd MMM yyyy, HH:mm") • @ev.Location</p>
+                            </div>
+                            <span class="capacity-pill">@ev.CurrentAttendees / @ev.MaxCapacity</span>
+                        </article>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <h3>Нямаш предстоящи събития</h3>
+                    <p>Създай ново събитие и то ще се появи тук.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

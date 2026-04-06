@@ -1,0 +1,35 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="auth-shell">
+    <div class="auth-copy">
+        <span class="eyebrow">Welcome back</span>
+        <h1>Влез в профила си</h1>
+        <p>Достъпи своите събития, график и участници само с няколко клика.</p>
+    </div>
+    <div class="content-card">
+        <form asp-action="Login" method="post" class="stack-panel">
+            @Html.AntiForgeryToken()
+            <input asp-for="ReturnUrl" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div>
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-brand w-100">Login</button>
+            <p class="mb-0 text-center">Нямаш акаунт? <a asp-action="Register">Регистрирай се</a></p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
